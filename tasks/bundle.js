@@ -7,11 +7,11 @@ const rename = require('gulp-rename');
 const chmod = require('gulp-chmod');
 const download = require('gulp-download');
 const shell = require('gulp-shell');
-const runSequence = require('run-sequence');
+const runSequence = require('gulp4-run-sequence');
 const {execSync} = require('child_process');
 
 function setupHooks(gulp, hookableSteps, hooks, context) {
-  const noOpTask = _.noop;
+  const noOpTask = function(cb) { cb(null); };
   const supportedHooks = {};
   _.each(hookableSteps, (s) => {
     supportedHooks[`pre:${s}`] = noOpTask;
@@ -207,7 +207,7 @@ module.exports = function(gulp) {
     });
 
     gulp.task('bundle:preinstallPackages', () => {
-      return gulp.src('')
+      return gulp.src('.')
         .pipe(shell(`${npmCmd} install`, {cwd: __dirname, quiet: true}));
     });
 
@@ -228,7 +228,7 @@ module.exports = function(gulp) {
           bundledPkgs), null, 2));
     });
     gulp.task('bundle:installDeps', () => {
-      return gulp.src('')
+      return gulp.src('.')
         .pipe(shell(`${npmInstallCmd}`, {cwd: bundleOutputDir, quiet: true}));
     });
 
@@ -296,7 +296,7 @@ module.exports = function(gulp) {
     });
 
     gulp.task('bundle:compress', () => {
-      return gulp.src('')
+      return gulp.src('.')
         .pipe(shell(
           `mv ./bundle ./${bundleOutputName} && \
           tar czf ${bundleOutputName}.tar.gz ${bundleOutputName} && \
